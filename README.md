@@ -20,6 +20,7 @@ Nikon .nd2 file with endothelial nuclei specific staining
 "getNuclearMaxIP.ijm" 
 ### Directories specified:
 Input folder of raw images
+
 Output folder of maxIP images of nuclei-only
 ### Instructions
 1. Open Fiji
@@ -37,9 +38,11 @@ Output folder of maxIP images of nuclei-only
 “segmentation.ipynb"
 ### Directories specified:
 Input folder of maxIP .tif images of nuclei only
+
 Output folder of segmented, binary .tif images of nuclei only
+
 QC output folder of segmented nuclei but filtered by removing peripheral nuclei cutoff by the image field of view
-(optional) output folder of individual nuclei that can be used in the shiny app visualization.
+
 ### Instructions
 1. Open segmentation Jupyter notebook, “segmentation.ipynb”
 2. Modify the input and output directories to match where the unsegmented .tif files are located (dataPath) and where you would like to the output segmented .tif images to be located (savePath). For example:
@@ -65,6 +68,7 @@ pretrained_model="dysmorphicNucleiCellposeModel"). Cellpose documentation regard
 “metrics.ipynb”
 ### Directories specified
 Input folder of segmented, quality-controlled .tif images
+
 Output directory for holding .csv table of all metric tables
 
 ### Instructions:
@@ -80,7 +84,9 @@ Output directory for holding .csv table of all metric tables
 metricPlots.R
 ### Directories specified:
 Input feature table (.csv) from Step 3
+
 Output UMAP embedding with associated metadata (.csv)
+
 Plot directory for all resultant UMAP .svg and .png files
 ### Instructions:
 1. Change your file paths to reflect the locations of the above directories.
