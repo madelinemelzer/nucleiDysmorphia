@@ -2,9 +2,9 @@
 setBatchMode(true);
 
 // Define the base input and output directories
-baseDir = "/Volumes/fsmresfiles/Basic_Sciences/CDB/CDB_Collaborations/Arispe_Goyal/MadelineMelzer/DATA/nucleiDysmorphia/data/age_final/";
+baseDir = "/Volumes/fsmresfiles/Basic_Sciences/CDB/CDB_Collaborations/Arispe_Goyal/MadelineMelzer/DATA/nucleiDysmorphia/data/age/newImages/";
 
-subfolders = newArray("7wk", "12wk", "24wk", "52wk"); 
+subfolders = newArray("12wk", "24wk", "52wk"); 
 
 for (subfolderIndex = 0; subfolderIndex < subfolders.length; subfolderIndex++) {
     inputDir = baseDir + subfolders[subfolderIndex] + "/raw/";
