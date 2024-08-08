@@ -1,6 +1,6 @@
 # Pipeline for multi-feature analysis of aortic endothelial nuclear shape 
 ## Salvador, J., … Melzer, M.E.,... Goyal, Y., … Iruela-Arispe, M.L., 2024
-Created by MEM on 20231021, last update by MEM 20240118
+Created by MEM on 20231021, last update by MEM 20240807
 
 ![pipelineSteps](https://github.com/madelinemelzer/nucleiDysmorphia/assets/121903053/141ec955-0366-437e-a881-fec88755fe2f)
 
@@ -74,7 +74,7 @@ Output directory for holding .csv table of all metric tables
 ### Instructions:
 1. Open metric calculation Jupyter notebook, “metrics.ipynb”
 2. Execute the code cell that imports all necessary libraries.
-3. Execute every code cell that defines a function.
+3. Execute every code cell that defines a function. Note that in the main() function cell, you can choose to comment out extraction of the genotype if it is unnecessary for your data.
 4. Modify input and output directories to reflect the location of your segmented, quality-controlled images and where the results will be located.
 5. Execute the code cell which calls the main() function and saves the output to dfResult, df_distance, and then to .csv files.
 6. Execute the last cell in the notebook which provides a histogram of the nuclear area. Take note of the upper and lower bounds, which you will use as area cutoffs when making the UMAP. 
@@ -91,10 +91,10 @@ Plot directory for all resultant UMAP .svg and .png files
 ### Instructions:
 1. Change your file paths to reflect the locations of the above directories.
 2. Edit the lower and upper bounds of the area threshold to reflect the results from Step 3.
-3. Execute all the code up until line 129, where the scree plot for the PCAs is displayed. Identify the number of PCAs to use based on where the plot tapers off and no additional variance is captured by adding another PCA. For example, in the following plot, the number of PCAs to choose was 11. 
+3. Execute all the code up until line 141, where the scree plot for the PCAs is displayed. Identify the number of PCAs to use based on where the plot tapers off and no additional variance is captured by adding another PCA. For example, in the following plot, the number of PCAs to choose was 11. Two notes: 1) in line 41, I have specified to filter based on a genotype. This may or may not be useful for your dataset. Remove if unnecessary. 2) For line 131, data for the PCA is saved. 
 
 ![pcaScree](https://github.com/madelinemelzer/nucleiDysmorphia/assets/121903053/bc0f186e-0d02-4722-86c1-d1d0c9ca21cd)
 
 4. Edit the number of PCAs that make the UMAP based on the results from the above scree plot.
-5. Execute lines 130-138 to create the UMAP dataframe, which you can save with associated metadata.
-6. Execute lines 142-160 to plot the UMAP and optionally save results. 
+5. Execute lines 145-154 to create the UMAP dataframe, which you can save with associated metadata.
+6. Execute lines 158-177 to plot the UMAP and optionally save results.
