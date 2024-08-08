@@ -1,5 +1,5 @@
 ####script for Salvador et al. Morphology analysis to make an interactive UMAP shiny app where you can see the shapes the UMAP dots correspond to
-####created by Madeline Melzer 20230915, last update by Madeline Melzer on 20240117
+####created by Madeline Melzer 20230915, last update by Madeline Melzer on 20240806
 
 library(tidyverse)
 library(ggplot2)
@@ -21,7 +21,7 @@ plotDirectory <- "/Volumes/fsmresfiles/Basic_Sciences/CDB/CDB_Collaborations/Ari
 imageURIDirectory = "/Volumes/fsmresfiles/Basic_Sciences/CDB/CDB_Collaborations/Arispe_Goyal/MadelineMelzer/DATA/nucleiDysmorphia/data/age/individuals/"
 
 
-data = as_tibble(read.table(paste0(dataDirectory, "20240117_umap_allMetrics.csv"), stringsAsFactors=F, header = T, sep = ","))
+data = as_tibble(read.table(paste0(dataDirectory, "20240806_umap_allMetrics.csv"), stringsAsFactors=F, header = T, sep = ","))
 data$age <- as.character(data$age)
 data$animal <- as.character(data$animal)
 
