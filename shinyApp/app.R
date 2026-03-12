@@ -88,24 +88,6 @@ variable_names <- c("file", "label", "age", "sex", "animal", "location",
                     'xInterceptCount',
                     'concavityCount')
 
-# Convert image to Data URI function
-image_to_dataURI <- function(image_path) {
-  # Read the binary image data
-  img_data <- readBin(image_path, what = raw(), n = file.info(image_path)$size)
-  
-  # Convert to base64
-  base64_img <- base64encode(img_data)
-  
-  # Construct the Data URI without the img tag
-  data_uri <- paste0("data:image/png;base64,", base64_img)
-  return(data_uri)
-}
-
-# Use the function to generate Data URIs for your images
-data$image_dataURI <- mapply(function(f, l) {
-  image_path <- paste0(imageURIDirectory, sub(".tif$", "", basename(f)), "_", l, ".png")
-  image_to_dataURI(image_path)
-}, data$file, data$label, SIMPLIFY = TRUE)
 
 
 server <- function(input, output) {
@@ -268,18 +250,5 @@ ui <- fluidPage(
 )
 options(shiny.launch.browser = TRUE)
 shinyApp(ui = ui, server = server)
-
-
-
-
-##############################################################################
-########################## GENESIS OF SHINY APP WEB HOSTING ##################
-##############################################################################
-
-install.packages("rsconnect")
-
-saveRDS(data, "/Volumes/fsmresfiles/Basic_Sciences/CDB/CDB_Collaborations/Arispe_Goyal/MadelineMelzer/DATA/nucleiDysmorphia/scripts/nucleiDysmorphia/data.rds")
-
-
 
 
