@@ -1,5 +1,5 @@
 ####script for Salvador et al. Morphology analysis to make an interactive UMAP shiny app where you can see the shapes the UMAP dots correspond to
-####created by Madeline Melzer 20230915, last update by Madeline Melzer on 20240806
+####created by Madeline Melzer 20230915, last update by Madeline Melzer on 20260312
 
 library(tidyverse)
 library(ggplot2)
@@ -116,93 +116,79 @@ data$image_dataURI <- mapply(function(f, l) {
 }, data$file, data$label, SIMPLIFY = TRUE)
 
 
-
-
 server <- function(input, output) {
-
+  
+  data$row_id <- seq_len(nrow(data))
+  
   data$custom_info <- paste("<br>", "Age: ", data$age, " wk", "<br>",
                             "Location: ", data$location, "<br>",
                             "Sex: ", data$sex, "<br>",
                             "Animal: ", data$animal, "<br>")
-
-  # Reactive variable to store the URI of the clicked point
-  clickedURI <- reactiveVal(NULL)
-
+  
+  clicked_image_data <- reactiveVal(list(uri=NULL))
+  
   output$umapPlot <- renderPlotly({
     
-    p <- ggplot(data, aes_string(x = "UMAP1", y = "UMAP2", color = input$color_var, customdata = "custom_info", ids = "image_dataURI"))
-    p <- p +
-      geom_point(size = 3) +
-      theme_classic(base_size = 18) +
-      coord_fixed(ratio = 1) +
-      labs(x = "UMAP1", y = "UMAP2")
-    
-    # Conditional check for scale
     if (input$color_var %in% continuous_vars) {
-      p <- p + scale_color_viridis_c()
+      p <- plot_ly(data, x = ~UMAP1, y = ~UMAP2,
+                   color = ~get(input$color_var),
+                   colors = viridis(256),
+                   key = ~row_id,
+                   text = ~custom_info,
+                   hoverinfo = "text",
+                   type = "scatter", mode = "markers",
+                   marker = list(size = 8),
+                   source = "umapPlot")
     } else {
-      p <- p + scale_color_viridis_d()
+      p <- plot_ly(data, x = ~UMAP1, y = ~UMAP2,
+                   color = ~as.factor(get(input$color_var)),
+                   colors = viridis(length(unique(data[[input$color_var]]))),
+                   key = ~row_id,
+                   text = ~custom_info,
+                   hoverinfo = "text",
+                   type = "scatter", mode = "markers",
+                   marker = list(size = 8),
+                   source = "umapPlot")
     }
     
-    p_plotly = ggplotly(p, tooltip = "customdata")
-
-    p_plotly <- onRender(p_plotly, "
-       function(el) {
-          el.on('plotly_hover', function(data) {
-            // Adjust hover handling here
-            // This can include more precise determination of the hovered point
-          });
-       
-          el.on('plotly_click', function(data) {
-             var uri = el.data[0].ids[data.points[0].pointNumber];
-             Shiny.setInputValue('clicked_image_uri', uri); // Send the URI to Shiny
-
-             var customInfo = data.points[0].customdata;
-             $('.hoverlayer .hovertext').html(customInfo);
-          });
-       }
-    ")
-
-    return(p_plotly)
+    p %>% layout(
+      xaxis = list(title = "UMAP1"),
+      yaxis = list(title = "UMAP2", scaleanchor = "x", scaleratio = 1)
+    )
   })
-
-  # Display the clicked image within the app
+  
+  observeEvent(event_data("plotly_click", source = "umapPlot"), {
+    click <- event_data("plotly_click", source = "umapPlot")
+    
+    if (!is.null(click)) {
+      row_index <- as.integer(click$key)
+      
+      clicked_values <- sapply(variable_names, function(var) {
+        data[[var]][row_index]
+      }, USE.NAMES = TRUE)
+      
+      clicked_values$uri <- data$image_dataURI[row_index]
+      clicked_image_data(clicked_values)
+    }
+  })
+  
   output$clickedImage <- renderUI({
     current_data <- clicked_image_data()
     if (!is.null(current_data$uri)) {
-      # Exclude the 'uri' from the displayed data
       displayed_data <- current_data[!names(current_data) %in% "uri"]
       
-      # Generate the UI elements
       ui_elements <- lapply(names(displayed_data), function(name) {
         tags$p(paste(name, ":", displayed_data[[name]]))
       })
       
-      # Create a layout with image in one column and metadata in another column
       fluidRow(
-        column(6, tags$img(src = current_data$uri, width = "100%")), # Image column
-        column(6, ui_elements)  # Metadata column
+        column(6, tags$img(src = current_data$uri, width = "100%")),
+        column(6, ui_elements)
       )
     }
   })
-  
-  # Reactive values to store the image URI and associated metadata
-  clicked_image_data <- reactiveVal(list(uri=NULL, age=NULL, sex=NULL, location=NULL))
-  
-  # On image click, update the reactive values with the current data
-  observeEvent(input$clicked_image_uri, {
-    image_index <- which(data$image_dataURI == input$clicked_image_uri)
-    # Create a named list dynamically
-    clicked_values <- sapply(variable_names, function(var) {
-      data[[var]][image_index]
-    }, USE.NAMES = TRUE)
-    # Add the image URI
-    clicked_values$uri <- input$clicked_image_uri
-    # Store the data
-    clicked_image_data(clicked_values)
-  })
-
 }
+
 
 
 ui <- fluidPage(
@@ -228,7 +214,7 @@ ui <- fluidPage(
   #Subheader
   div(
     style = "font-size: 24px; text-align:center;",   # Adjust this value for desired font size
-    "Salvador, J., … Melzer, M.E.,... Goyal, Y., … Iruela Arispe, M.L., 2023", 
+    "Salvador, J., … Melzer, M.E.,... Goyal, Y., … Iruela Arispe, M.L., 2026", 
     tags$br()
     
   ), 
@@ -237,7 +223,7 @@ ui <- fluidPage(
     style = "font-size: 18px; text-align:center;",
     "Created by MEM on 20230915", 
     tags$br(), 
-    "Last update by MEM on 20231117"
+    "Last update by MEM on 20260312"
   ),
   
   selectInput("color_var",
@@ -288,51 +274,8 @@ ui <- fluidPage(
     column(5, uiOutput("clickedImage"))   # This takes up 4/12 of the row's width
   )
 )
-
+options(shiny.launch.browser = TRUE)
 shinyApp(ui = ui, server = server)
-
-
-
-
-#########Revised
-
-
-server <- function(input, output) {
-  
-  data$custom_info <- paste("<br>", "Age: ", data$age, " wk", "<br>",
-                            "Location: ", data$location, "<br>",
-                            "Sex: ", data$sex, "<br>",
-                            "Animal: ", data$animal, "<br>")
-  
-  # Reactive variable to store the URI of the clicked point
-  clickedURI <- reactiveVal(NULL)
-  
-  output$umapPlot <- renderPlotly({
-    # ... [plotting code remains the same]
-    
-    # Modify the onRender script
-    p_plotly <- onRender(p_plotly, "
-       function(el) {
-          el.on('plotly_hover', function(data) {
-            // Adjust hover handling here
-            // This can include more precise determination of the hovered point
-          });
-          el.on('plotly_click', function(data) {
-             // Adjust click handling here
-             // Ensure that the clicked point's data is accurately captured
-          });
-       }
-    ")
-    
-    
-    
-    return(p_plotly)
-  })
-  
-  # ... [rest of your code remains the same]
-}
-
-
 
 
 
